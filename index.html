@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html lang="so">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BakeMaster MIS — Nidaamka Maamulka Dukaanka Rootiga</title>
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app-layout">
+    
+    <!-- ==================== SIDEBAR ==================== -->
+    <aside class="sidebar" id="sidebar">
+      <div class="brand">
+        <div class="brand-icon">
+          <i class="fa-solid fa-cake-candles"></i>
+        </div>
+        <div class="brand-text">
+          <h2>BakeMaster</h2>
+          <span>Rooti & Macmacaan MIS</span>
+        </div>
+      </div>
+
+      <nav class="nav-menu">
+        <button class="nav-item active" data-view="dashboard">
+          <i class="fa-solid fa-chart-pie"></i>
+          <span>Dashboard</span>
+        </button>
+        <button class="nav-item" data-view="products">
+          <i class="fa-solid fa-cookie-bite"></i>
+          <span>Products</span>
+        </button>
+        <button class="nav-item" data-view="categories">
+          <i class="fa-solid fa-layer-group"></i>
+          <span>Categories</span>
+        </button>
+        <button class="nav-item" data-view="sales">
+          <i class="fa-solid fa-cash-register"></i>
+          <span>Sales (Iibka)</span>
+        </button>
+        <button class="nav-item" data-view="inventory">
+          <i class="fa-solid fa-boxes-stacked"></i>
+          <span>Inventory (Kaydka)</span>
+        </button>
+        <button class="nav-item" data-view="customers">
+          <i class="fa-solid fa-users"></i>
+          <span>Customers</span>
+        </button>
+        <button class="nav-item" data-view="reports">
+          <i class="fa-solid fa-file-invoice-dollar"></i>
+          <span>Reports</span>
+        </button>
+        <button class="nav-item" data-view="settings">
+          <i class="fa-solid fa-sliders"></i>
+          <span>Settings</span>
+        </button>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="backend-status-card">
+          <span class="status-dot active" id="db-status-dot"></span>
+          <div>
+            <p class="status-title" id="db-status-title">SQLite Database</p>
+            <small class="status-sub" id="db-status-sub">Xogta waa la xafiday</small>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- ==================== MAIN CONTENT ==================== -->
+    <main class="main-content">
+      <!-- Top Bar -->
+      <header class="topbar">
+        <div class="topbar-left">
+          <button class="menu-toggle-btn" id="menuToggle" aria-label="Toggle menu">
+            <i class="fa-solid fa-bars"></i>
+          </button>
+          <div class="page-title-box">
+            <h1 id="pageTitle">Dashboard — Bogga Guud</h1>
+            <p id="pageSubtitle">Ku soo dhawoow Nidaamka Maamulka Dukaanka Rootiga</p>
+          </div>
+        </div>
+        <div class="topbar-right">
+          <button class="btn btn-primary" onclick="openSaleModal()">
+            <i class="fa-solid fa-cart-plus"></i> Iib Cusub
+          </button>
+          <div class="user-pill">
+            <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80" alt="Admin">
+            <div>
+              <strong>Maamule</strong>
+              <small>MIS Project</small>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <div class="content-wrapper">
+
+        <!-- ==================== VIEW 1: DASHBOARD ==================== -->
+        <section class="view-section active" id="view-dashboard">
+          <!-- Stat Cards -->
+          <div class="stats-grid">
+            <div class="stat-card pink-card">
+              <div class="stat-icon"><i class="fa-solid fa-bread-slice"></i></div>
+              <div class="stat-details">
+                <span class="stat-label">Wadarta Alaabta</span>
+                <h3 class="stat-value" id="dashTotalProducts">0</h3>
+                <small class="stat-info">Alaabo firfircoon</small>
+              </div>
+            </div>
+
+            <div class="stat-card brown-card">
+              <div class="stat-icon"><i class="fa-solid fa-sack-dollar"></i></div>
+              <div class="stat-details">
+                <span class="stat-label">Wadarta Iibka</span>
+                <h3 class="stat-value" id="dashTotalSales">$0.00</h3>
+                <small class="stat-info" id="dashTotalSalesCount">0 Iib guud</small>
+              </div>
+            </div>
+
+            <div class="stat-card cream-card">
+              <div class="stat-icon"><i class="fa-solid fa-boxes-packing"></i></div>
+              <div class="stat-details">
+                <span class="stat-label">Kaydka Taalla</span>
+                <h3 class="stat-value" id="dashTotalStock">0</h3>
+                <small class="stat-info">Xabbo oo kayd ah</small>
+              </div>
+            </div>
+
+            <div class="stat-card alert-card">
+              <div class="stat-icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
+              <div class="stat-details">
+                <span class="stat-label">Kaydka Sii Dhamaanaya</span>
+                <h3 class="stat-value" id="dashLowStockCount">0</h3>
+                <small class="stat-info">U baahan dib u buuxin</small>
+              </div>
+            </div>
+          </div>
+
+          <!-- Quick Charts / Overview Grid -->
+          <div class="dashboard-grid">
+            <div class="card recent-sales-card">
+              <div class="card-header">
+                <div>
+                  <h3 class="card-title">Iibkii Ugu Dambeeyay (Recent Sales)</h3>
+                  <p class="card-subtitle">Dhaqdhaqaaqa iibka ee ugu dambeeyey</p>
+                </div>
+                <button class="btn btn-secondary btn-sm" onclick="navigateToView('sales')">Dhammaan Iibka &rarr;</button>
+              </div>
+              <div class="table-responsive">
+                <table class="data-table">
+                  <thead>
+                    <tr>
+                      <th>Invoice ID</th>
+                      <th>Macaamilka</th>
+                      <th>Alaabta</th>
+                      <th>Taariikhda</th>
+                      <th>Wadarta</th>
+                      <th>Falalka</th>
+                    </tr>
+                  </thead>
+                  <tbody id="recentSalesTbody">
+                    <!-- Populated by JS -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <div class="card low-stock-card">
+              <div class="card-header">
+                <div>
+                  <h3 class="card-title">Digniinta Kaydka (Low Stock)</h3>
+                  <p class="card-subtitle">Alaabta kaydkeedu ka yar yahay 8 xabbo</p>
+                </div>
+                <button class="btn btn-secondary btn-sm" onclick="navigateToView('inventory')">Maamul Kaydka</button>
+              </div>
+              <div class="low-stock-list" id="lowStockList">
+                <!-- Populated by JS -->
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================== VIEW 2: PRODUCTS ==================== -->
+        <section class="view-section" id="view-products">
+          <div class="section-toolbar">
+            <div class="search-filter-box">
+              <div class="search-input-wrap">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="text" id="productSearch" placeholder="Raadi alaab magaceeda..." onkeyup="filterProducts()">
+              </div>
+              <select id="categoryFilter" onchange="filterProducts()" class="form-select">
+                <option value="All">Dhammaan Qaybaha (All)</option>
+                <option value="Cakes">Cakes</option>
+                <option value="Donuts">Donuts</option>
+                <option value="Cupcakes">Cupcakes</option>
+                <option value="Bread">Bread</option>
+                <option value="Cookies">Cookies</option>
+                <option value="Other Desserts">Other Desserts</option>
+              </select>
+            </div>
+            <button class="btn btn-primary" onclick="openProductModal()">
+              <i class="fa-solid fa-plus"></i> Kudar Alaab Cusub
+            </button>
+          </div>
+
+          <!-- Product Cards Grid -->
+          <div class="products-grid" id="productsGrid">
+            <!-- Populated by JS with 6+ High-Quality Bakery Items -->
+          </div>
+        </section>
+
+        <!-- ==================== VIEW 3: CATEGORIES ==================== -->
+        <section class="view-section" id="view-categories">
+          <div class="categories-header-note">
+            <h3>Qaybaha Alaabta Dukaanka (Product Categories)</h3>
+            <p>Xulo qayb kasta si aad u aragto alaabta hoos timaadda iyo qiimaha kaydka guud.</p>
+          </div>
+          <div class="categories-grid" id="categoriesGrid">
+            <!-- Populated by JS -->
+          </div>
+        </section>
+
+        <!-- ==================== VIEW 4: SALES (POS & HISTORY) ==================== -->
+        <section class="view-section" id="view-sales">
+          <div class="sales-tabs">
+            <button class="tab-btn active" onclick="switchSalesTab('pos')"><i class="fa-solid fa-cash-register"></i> Qeybta Iibka (POS)</button>
+            <button class="tab-btn" onclick="switchSalesTab('history')"><i class="fa-solid fa-clock-rotate-left"></i> Taariikhda Iibka (Sales History)</button>
+          </div>
+
+          <!-- POS Screen -->
+          <div class="pos-layout" id="posView">
+            <div class="pos-catalog card">
+              <div class="pos-search-bar">
+                <input type="text" id="posSearch" placeholder="Raadi alaabta la iibinayo..." onkeyup="renderPosProducts()">
+                <div class="pos-cat-pills" id="posCatPills">
+                  <!-- Category filter pills -->
+                </div>
+              </div>
+              <div class="pos-items-grid" id="posItemsGrid">
+                <!-- Products to click and add to bill -->
+              </div>
+            </div>
+
+            <!-- Billing / Cart Drawer -->
+            <div class="pos-billing card">
+              <div class="card-header">
+                <h3>Qaansheegta Iibka (Current Bill)</h3>
+                <button class="btn btn-sm btn-outline-danger" onclick="clearCart()">Nadiifi</button>
+              </div>
+              
+              <div class="customer-select-wrap">
+                <label for="posCustomer">Macaamilka:</label>
+                <select id="posCustomer" class="form-select">
+                  <option value="Macaamil Caadi ah">Macaamil Caadi ah (Walk-in)</option>
+                </select>
+              </div>
+
+              <div class="cart-items-container" id="cartItemsContainer">
+                <div class="empty-cart-message">
+                  <i class="fa-solid fa-basket-shopping"></i>
+                  <p>Weli wax alaab ah maadan dooran.<br>Guji alaabta si aad ugu darto iibka.</p>
+                </div>
+              </div>
+
+              <div class="bill-summary">
+                <div class="bill-row">
+                  <span>Wadarta Hoose (Subtotal):</span>
+                  <strong id="billSubtotal">$0.00</strong>
+                </div>
+                <div class="bill-row">
+                  <span>Cashuur / Tax (0%):</span>
+                  <span>$0.00</span>
+                </div>
+                <div class="bill-row total-row">
+                  <span>Wadarta Guud (Total):</span>
+                  <span id="billGrandTotal">$0.00</span>
+                </div>
+
+                <div class="payment-method-wrap">
+                  <label>Habka Lacag-bixinta:</label>
+                  <div class="pay-options">
+                    <label class="pay-option active">
+                      <input type="radio" name="payMethod" value="Cash" checked>
+                      <span><i class="fa-solid fa-money-bill-wave"></i> Kaash</span>
+                    </label>
+                    <label class="pay-option">
+                      <input type="radio" name="payMethod" value="EVC Plus/Zaad">
+                      <span><i class="fa-solid fa-mobile-screen"></i> Zaad/EVC</span>
+                    </label>
+                    <label class="pay-option">
+                      <input type="radio" name="payMethod" value="Card">
+                      <span><i class="fa-solid fa-credit-card"></i> Kaadh</span>
+                    </label>
+                  </div>
+                </div>
+
+                <button class="btn btn-primary btn-block btn-lg" onclick="checkoutSale()">
+                  <i class="fa-solid fa-circle-check"></i> Dhameystir Iibka ($<span id="btnPayTotal">0.00</span>)
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Sales History Screen -->
+          <div class="sales-history card" id="historyView" style="display: none;">
+            <div class="card-header">
+              <div>
+                <h3 class="card-title">Liiska Iibka oo Dhan (All Invoices)</h3>
+                <p class="card-subtitle">Raadi, daabac rasiidhada, ama tirtir</p>
+              </div>
+              <input type="text" id="salesSearch" class="form-input" placeholder="Raadi Invoice ama Macaamil..." onkeyup="filterSalesHistory()" style="width: 280px;">
+            </div>
+            <div class="table-responsive">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Invoice No</th>
+                    <th>Taariikhda & Waqtiga</th>
+                    <th>Macaamilka</th>
+                    <th>Habka Lacagta</th>
+                    <th>Alaabta La Iibiyay</th>
+                    <th>Wadarta</th>
+                    <th>Falalka</th>
+                  </tr>
+                </thead>
+                <tbody id="salesHistoryTbody">
+                  <!-- Populated by JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================== VIEW 5: INVENTORY ==================== -->
+        <section class="view-section" id="view-inventory">
+          <div class="section-toolbar">
+            <div class="search-filter-box">
+              <div class="search-input-wrap">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="text" id="inventorySearch" placeholder="Raadi kaydka alaabta..." onkeyup="filterInventory()">
+              </div>
+              <button class="btn btn-secondary" onclick="filterLowStockOnly()">
+                <i class="fa-solid fa-filter"></i> Kaliya Kaydka Yar
+              </button>
+            </div>
+            <button class="btn btn-primary" onclick="openProductModal()">
+              <i class="fa-solid fa-plus"></i> Kudar Alaab Cusub
+            </button>
+          </div>
+
+          <div class="card">
+            <div class="table-responsive">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Sawirka</th>
+                    <th>Magaca Alaabta</th>
+                    <th>Qaybta (Category)</th>
+                    <th>Qiimaha Xabbada</th>
+                    <th>Kaydka Hadda</th>
+                    <th>Xaaladda Kaydka</th>
+                    <th>Kordhi Kaydka</th>
+                  </tr>
+                </thead>
+                <tbody id="inventoryTbody">
+                  <!-- Populated by JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================== VIEW 6: CUSTOMERS ==================== -->
+        <section class="view-section" id="view-customers">
+          <div class="section-toolbar">
+            <div class="search-input-wrap">
+              <i class="fa-solid fa-magnifying-glass"></i>
+              <input type="text" id="customerSearch" placeholder="Raadi macaamil magac ama telefoon..." onkeyup="filterCustomers()">
+            </div>
+            <button class="btn btn-primary" onclick="openCustomerModal()">
+              <i class="fa-solid fa-user-plus"></i> Diiwaangeli Macaamil Cusub
+            </button>
+          </div>
+
+          <div class="card">
+            <div class="table-responsive">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Magaca Macaamilka</th>
+                    <th>Telefoonka</th>
+                    <th>Email</th>
+                    <th>Wadarta Iibka</th>
+                    <th>Iibkii u Dambeeyey</th>
+                    <th>Falalka</th>
+                  </tr>
+                </thead>
+                <tbody id="customersTbody">
+                  <!-- Populated by JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================== VIEW 7: REPORTS ==================== -->
+        <section class="view-section" id="view-reports">
+          <div class="reports-stats-grid">
+            <div class="card report-box">
+              <i class="fa-solid fa-chart-line"></i>
+              <h4>Dakhliga Guud</h4>
+              <h2 id="repTotalRevenue">$0.00</h2>
+              <small>Iibka guud ee la diiwaangeliyay</small>
+            </div>
+            <div class="card report-box">
+              <i class="fa-solid fa-receipt"></i>
+              <h4>Wadarta Qaansheegyada</h4>
+              <h2 id="repTotalInvoices">0</h2>
+              <small>Tirada rasiidhada la gooyey</small>
+            </div>
+            <div class="card report-box">
+              <i class="fa-solid fa-cookie"></i>
+              <h4>Alaabta La Iibiyey</h4>
+              <h2 id="repTotalItemsSold">0 xabbo</h2>
+              <small>Wadarta xabbadaha dukaanka ka baxay</small>
+            </div>
+            <div class="card report-box">
+              <i class="fa-solid fa-warehouse"></i>
+              <h4>Qiimaha Kaydka Yaalla</h4>
+              <h2 id="repInventoryValue">$0.00</h2>
+              <small>Qiimaha guud ee kaydka yaalla</small>
+            </div>
+          </div>
+
+          <div class="dashboard-grid" style="margin-top: 24px;">
+            <div class="card">
+              <div class="card-header">
+                <h3 class="card-title">Alaabta Ugu Iibka Badan (Top Selling Products)</h3>
+              </div>
+              <div class="table-responsive">
+                <table class="data-table">
+                  <thead>
+                    <tr>
+                      <th>Alaabta</th>
+                      <th>Qaybta</th>
+                      <th>Xabbad La Iibiyay</th>
+                      <th>Dakhliga Ka Soo Galay</th>
+                    </tr>
+                  </thead>
+                  <tbody id="topSellingTbody">
+                    <!-- Populated by JS -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="card-header">
+                <h3 class="card-title">Warbixinta Qaybaha (Sales by Category)</h3>
+              </div>
+              <div id="categorySalesBreakdown" class="category-breakdown-list">
+                <!-- Populated by JS -->
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================== VIEW 8: SETTINGS ==================== -->
+        <section class="view-section" id="view-settings">
+          <div class="card settings-card">
+            <h3>Dejinta Nidaamka (Bakery Settings)</h3>
+            <p class="card-subtitle">Macluumaadka dukaanka iyo maaraynta xogta mashruuca</p>
+            
+            <form id="settingsForm" onsubmit="saveSettings(event)" style="margin-top: 20px;">
+              <div class="form-row">
+                <div class="form-group">
+                  <label>Magaca Dukaanka:</label>
+                  <input type="text" id="settingBakeryName" class="form-input" value="BakeMaster Bakery & Sweets">
+                </div>
+                <div class="form-group">
+                  <label>Calaamadda Lacagta (Currency):</label>
+                  <select id="settingCurrency" class="form-select">
+                    <option value="$" selected>US Dollar ($)</option>
+                    <option value="SLSH">Somaliland Shilling (SLSH)</option>
+                    <option value="SOS">Somali Shilling (SOS)</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label>Xadka Digniinta Kaydka Yar (Low stock threshold):</label>
+                  <input type="number" id="settingLowStock" class="form-input" value="8" min="1">
+                </div>
+                <div class="form-group">
+                  <label>Telefoonka Dukaanka (Rasiidhyada ku qoranta):</label>
+                  <input type="text" id="settingPhone" class="form-input" value="+252 61 5000000">
+                </div>
+              </div>
+
+              <button type="submit" class="btn btn-primary"><i class="fa-solid fa-floppy-disk"></i> Keydi Dejinta</button>
+            </form>
+
+            <hr style="margin: 30px 0; border: none; border-top: 1px solid var(--border);">
+
+            <div class="danger-zone">
+              <h4>Dib u Soo Celi Xogtii Tusaalaha ahayd (Reset Sample Data)</h4>
+              <p>Haddii aad rabto inaad dib u buuxiso 6-da sawir ee macmacaanka, iibka tusaalaha ah iyo macaamiisha:</p>
+              <button class="btn btn-outline-danger" onclick="resetToSampleData()">
+                <i class="fa-solid fa-arrows-rotate"></i> Dib u Soo Celi Xogta Tusaalaha ah
+              </button>
+            </div>
+          </div>
+        </section>
+
+      </div>
+    </main>
+  </div>
+
+  <!-- ==================== MODALS ==================== -->
+
+  <!-- 1. Product Modal (Add / Edit) -->
+  <div class="modal-backdrop" id="productModal">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3 id="productModalTitle">Kudar Alaab Cusub</h3>
+        <button class="modal-close" onclick="closeModal('productModal')">&times;</button>
+      </div>
+      <form id="productForm" onsubmit="handleProductSubmit(event)">
+        <input type="hidden" id="prodEditId">
+        <div class="modal-body">
+          <div class="form-group">
+            <label>Magaca Alaabta *</label>
+            <input type="text" id="prodName" class="form-input" required placeholder="Tusaale: Keeg Shukulaato oo Macaan">
+          </div>
+          
+          <div class="form-row">
+            <div class="form-group">
+              <label>Qaybta (Category) *</label>
+              <select id="prodCategory" class="form-select" required>
+                <option value="Cakes">Cakes</option>
+                <option value="Donuts">Donuts</option>
+                <option value="Cupcakes">Cupcakes</option>
+                <option value="Bread">Bread</option>
+                <option value="Cookies">Cookies</option>
+                <option value="Other Desserts">Other Desserts</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Qiimaha Xabbada ($) *</label>
+              <input type="number" id="prodPrice" class="form-input" step="0.01" min="0.1" required placeholder="15.00">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Tirada Kaydka (Stock Quantity) *</label>
+            <input type="number" id="prodStock" class="form-input" min="0" required placeholder="20">
+          </div>
+
+          <div class="form-group">
+            <label>Link-ga Sawirka (Image URL) *</label>
+            <input type="url" id="prodImage" class="form-input" required placeholder="https://images.unsplash.com/...">
+            <small class="helper-text">Dooro sawirrada degdegga ah hoos haddii aadan link haysan:</small>
+            <div class="quick-image-picker">
+              <span onclick="setSampleImg('cake')">🍰 Keeg</span>
+              <span onclick="setSampleImg('bday')">🎂 Dhalasho</span>
+              <span onclick="setSampleImg('donut')">🍩 Donut</span>
+              <span onclick="setSampleImg('cupcake')">🧁 Cupcake</span>
+              <span onclick="setSampleImg('bread')">🍞 Rooti</span>
+              <span onclick="setSampleImg('cookie')">🍪 Cookies</span>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Sharaxaad Kooban (Description)</label>
+            <textarea id="prodDescription" class="form-input" rows="2" placeholder="Sharaxaad kooban oo ku saabsan dhadhanka iyo maaddooyinka..."></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="closeModal('productModal')">Jooji</button>
+          <button type="submit" class="btn btn-primary" id="prodSubmitBtn">Keydi Alaabta</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 2. Customer Modal (Add / Edit) -->
+  <div class="modal-backdrop" id="customerModal">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3 id="customerModalTitle">Diiwaangeli Macaamil Cusub</h3>
+        <button class="modal-close" onclick="closeModal('customerModal')">&times;</button>
+      </div>
+      <form id="customerForm" onsubmit="handleCustomerSubmit(event)">
+        <input type="hidden" id="custEditId">
+        <div class="modal-body">
+          <div class="form-group">
+            <label>Magaca Macaamilka *</label>
+            <input type="text" id="custName" class="form-input" required placeholder="Tusaale: Axmed Cali">
+          </div>
+          <div class="form-group">
+            <label>Lambarka Telefoonka *</label>
+            <input type="tel" id="custPhone" class="form-input" required placeholder="+252 61 ...">
+          </div>
+          <div class="form-group">
+            <label>Email (Ikhtiyaari)</label>
+            <input type="email" id="custEmail" class="form-input" placeholder="macaamil@email.com">
+          </div>
+          <div class="form-group">
+            <label>Cinwaanka / Faahfaahin</label>
+            <input type="text" id="custAddress" class="form-input" placeholder="Xafadda, Magaalada">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="closeModal('customerModal')">Jooji</button>
+          <button type="submit" class="btn btn-primary">Keydi Macaamilka</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 3. Printable Receipt / Invoice Modal -->
+  <div class="modal-backdrop" id="receiptModal">
+    <div class="modal-dialog modal-receipt">
+      <div class="receipt-print-area" id="receiptPrintArea">
+        <div class="receipt-header">
+          <i class="fa-solid fa-cake-candles receipt-logo"></i>
+          <h2 id="rcptBakeryName">BakeMaster Bakery</h2>
+          <p id="rcptBakeryPhone">Tel: +252 61 5000000</p>
+          <p>Mogadishu / Hargeisa</p>
+          <div class="receipt-divider"></div>
+          <div class="receipt-meta">
+            <div><strong>Invoice:</strong> <span id="rcptInvoiceId">#INV-1001</span></div>
+            <div><strong>Taariikhda:</strong> <span id="rcptDate">2026-10-29</span></div>
+            <div><strong>Macaamilka:</strong> <span id="rcptCustomer">Axmed Cali</span></div>
+            <div><strong>Lacag-bixinta:</strong> <span id="rcptPaymentMethod">Kaash</span></div>
+          </div>
+          <div class="receipt-divider"></div>
+        </div>
+
+        <table class="receipt-table">
+          <thead>
+            <tr>
+              <th align="left">Alaabta</th>
+              <th align="center">Xabbo</th>
+              <th align="right">Qiimo</th>
+              <th align="right">Wadarta</th>
+            </tr>
+          </thead>
+          <tbody id="rcptItemsTbody">
+            <!-- Items injected by JS -->
+          </tbody>
+        </table>
+
+        <div class="receipt-divider"></div>
+        <div class="receipt-totals">
+          <div class="receipt-total-row grand">
+            <span>Wadarta Guud:</span>
+            <span id="rcptTotalAmount">$0.00</span>
+          </div>
+        </div>
+        
+        <div class="receipt-footer">
+          <p>*** Waad ku mahadsan tahay booqashadaada! ***</p>
+          <small>Nidaamka Dukaanka Rootiga — MIS Project</small>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeModal('receiptModal')">Xir</button>
+        <button class="btn btn-primary" onclick="printReceipt()"><i class="fa-solid fa-print"></i> Daabac Rasiidhka</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>
